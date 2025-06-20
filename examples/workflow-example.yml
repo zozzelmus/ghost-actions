@@ -1,0 +1,60 @@
+name: Publish to Ghost Blog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'posts/**'
+      - 'images/**'
+  workflow_dispatch:
+    inputs:
+      post_title:
+        description: 'Post title'
+        required: true
+        default: 'New Blog Post'
+      post_content:
+        description: 'Post content (markdown)'
+        required: true
+        default: '# New Post\n\nThis is a new blog post.'
+      post_status:
+        description: 'Post status'
+        required: false
+        default: 'draft'
+        type: choice
+        options:
+          - draft
+          - published
+
+jobs:
+  publish-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Publish Post to Ghost
+        uses: ./
+        with:
+          ghost_url: ${{ secrets.GHOST_URL }}
+          ghost_admin_api_key: ${{ secrets.GHOST_ADMIN_API_KEY }}
+          content_type: 'post'
+          title: ${{ github.event.inputs.post_title || 'New Blog Post' }}
+          content: ${{ github.event.inputs.post_content || '# New Post\n\nThis is a new blog post.' }}
+          status: ${{ github.event.inputs.post_status || 'draft' }}
+          tags: 'github-actions, automated'
+          excerpt: 'A new blog post published via GitHub Actions'
+
+  upload-images:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'images/') || contains(github.event.head_commit.added, 'images/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Upload Images to Ghost
+        uses: ./
+        with:
+          ghost_url: ${{ secrets.GHOST_URL }}
+          ghost_admin_api_key: ${{ secrets.GHOST_ADMIN_API_KEY }}
+          content_type: 'image'
+          image_path: './images/${{ github.event.head_commit.message }}' 

@@ -1,0 +1,52 @@
+name: 'Ghost Blog Publisher'
+description: 'Publish images and posts to Ghost blog service via API'
+author: 'Your Name'
+branding:
+  icon: 'book-open'
+  color: 'purple'
+
+inputs:
+  ghost_url:
+    description: 'Ghost blog URL (e.g., https://yourblog.ghost.io)'
+    required: true
+  ghost_admin_api_key:
+    description: 'Ghost Admin API key'
+    required: true
+  content_type:
+    description: 'Type of content to publish (post, image)'
+    required: true
+    default: 'post'
+  title:
+    description: 'Post title (required for posts)'
+    required: false
+  content:
+    description: 'Post content in markdown format (required for posts)'
+    required: false
+  image_path:
+    description: 'Path to image file (required for images)'
+    required: false
+  tags:
+    description: 'Comma-separated list of tags for the post'
+    required: false
+  status:
+    description: 'Post status (draft, published)'
+    required: false
+    default: 'draft'
+  excerpt:
+    description: 'Post excerpt'
+    required: false
+  feature_image:
+    description: 'URL or path to feature image for the post'
+    required: false
+
+outputs:
+  post_id:
+    description: 'ID of the created post'
+  post_url:
+    description: 'URL of the published post'
+  image_url:
+    description: 'URL of the uploaded image'
+
+runs:
+  using: 'node18'
+  main: 'dist/index.js' 
